@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-from mazeGeneration import generate_empty_maze
+from mazeGeneration import Maze
 from temporaryMazeVisualization import show_maze
 
 def main() -> None:
     print("Hellow Maze")
-    maze = generate_empty_maze(
+    maze = Maze(
         width=8,
         height=7,
         x_start=2,
@@ -12,6 +12,7 @@ def main() -> None:
         x_end=6,
         y_end=6
     )
+    maze.generate_empty()
     show_maze(maze)
 
 if __name__ == "__main__":
