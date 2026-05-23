@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 from mazeGeneration import Maze
 from temporaryMazeVisualization import show_maze
+import time as t
+import os
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
 
 def main() -> None:
+    clear()
     print("Hellow Maze")
     maze = Maze(
         width=8,
