@@ -9,7 +9,6 @@ def clear():
 
 def main() -> None:
     clear()
-    print("Hellow Maze")
     maze = Maze(
         width=8,
         height=7,
@@ -20,6 +19,16 @@ def main() -> None:
     )
     maze.generate_empty()
     show_maze(maze)
+    t.sleep(1)
+
+    steps = 100
+    for _ in range(steps):
+        maze.generate_path_step()
+        clear()
+        #print(maze.x_current)
+        #print(maze.y_current)
+        show_maze(maze)
+        t.sleep(0.4)
 
 if __name__ == "__main__":
     main()
