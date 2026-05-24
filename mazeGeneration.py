@@ -61,7 +61,6 @@ class Maze:
         return True
     
     def update_possition(self, direction: int) -> None:
-        self.maze[self.y_current][self.x_current] = 0 << SQUARE_OCCUPIED_BIT & self.maze[self.y_current][self.x_current]
         if direction == N:
             self.y_current += 1
         if direction == E:
@@ -70,7 +69,7 @@ class Maze:
             self.y_current -= 1
         if direction == W:
             self.x_current -= 1
-        self.maze[self.y_current][self.x_current] += 1 << SQUARE_OCCUPIED_BIT
+        self.maze[self.y_current][self.x_current] = self.maze[self.y_current][self.x_current] | 1 << SQUARE_OCCUPIED_BIT
 
     def generate_path_step(self) -> None:
         direction = 0
