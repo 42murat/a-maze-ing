@@ -71,10 +71,10 @@ class Maze:
             self.x_current -= 1
         self.maze[self.y_current][self.x_current] = self.maze[self.y_current][self.x_current] | 1 << SQUARE_OCCUPIED_BIT
 
-    def generate_path_step(self) -> None:
+    def generate_path_step(self, p: float) -> None:
         direction = 0
         while True:
-            direction = get_direction(self)
+            direction = get_direction(self, p)
             if self.check_direction(direction):
                 break
         self.update_possition(direction)

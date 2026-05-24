@@ -21,10 +21,15 @@ def main() -> None:
     show_maze(maze)
     t.sleep(1)
 
-    max_steps = 5000
+    max_steps = 500
     steps = 0
     for i in range(max_steps):
-        maze.generate_path_step()
+        if i < max_steps / 4:
+            maze.generate_path_step(-0.05)
+        elif i < max_steps / 2:
+            maze.generate_path_step(0)
+        else:
+            maze.generate_path_step(0.3)
         steps += 1
         clear()
         show_maze(maze)

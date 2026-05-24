@@ -29,7 +29,7 @@ def get_random_direction() -> int:
     else:
         return 67
     
-def get_direction(maze: Maze):
+def get_direction(maze: Maze, p: float = 0.1):
     """Returns direction for path generation.
     
     The direction probability is corelated (for now its constant diffrence) to how
@@ -44,7 +44,6 @@ def get_direction(maze: Maze):
     def sign(x):
         return 1 if x > 0 else -1 if x < 0 else 0
 
-    p = 0.1
     x_diff = maze.x_end - maze.x_current
     y_diff = maze.y_end - maze.y_current
     array_size = 4000
