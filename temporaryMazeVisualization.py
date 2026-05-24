@@ -4,7 +4,11 @@ by: Jozef Bugajewski <jozefBugajewski@gmail.com>
 This is functions that are used only during tests,
 the finall visualization of project probably will be handle other way but this might be some entry point
 """
-from mazeGeneration import Maze
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from mazeGeneration import Maze
 from ctypes import c_int8
 from const import SQUARE_OCCUPIED_BIT
 
@@ -22,6 +26,7 @@ def show_maze(maze: Maze):
     The green cell represents maze input.
     The red cell represents maze output.
     """
+    YELLOW = "\033[33m"
     GREEN = "\033[32m"
     RED = "\033[31m"
     RESET = "\033[0m"
@@ -35,6 +40,8 @@ def show_maze(maze: Maze):
             result = GREEN + result + RESET
         if cell_x == maze.x_end and cell_y == maze.y_end:
             result = RED + result + RESET
+        if cell_x == maze.x_current and cell_y == maze.y_current:
+            result = YELLOW + result + RESET
         return result
 
     for y, row in enumerate(reversed(maze.maze)):
