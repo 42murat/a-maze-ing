@@ -6,7 +6,7 @@ for now I focus on trying to gererate solution-path in empty maze.
 """
 from ctypes import c_int8
 from const import SQUARE_OCCUPIED_BIT, N, E, S, W
-from randomnesTests import get_direction, get_random_direction
+from mazeRandomnes import get_direction, get_random_direction
 
 class Maze:
     def __init__(
