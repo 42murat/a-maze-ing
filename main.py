@@ -10,25 +10,31 @@ def clear():
 def main() -> None:
     clear()
     maze = Maze(
-        width=8,
-        height=7,
-        x_start=2,
+        width=20,
+        height=20,
+        x_start=19,
         y_start=1,
-        x_end=6,
-        y_end=6
+        x_end=0,
+        y_end=0
     )
     maze.generate_empty()
     show_maze(maze)
     t.sleep(1)
 
-    steps = 100
-    for _ in range(steps):
+    max_steps = 5000
+    steps = 0
+    for i in range(max_steps):
         maze.generate_path_step()
+        steps += 1
         clear()
-        #print(maze.x_current)
-        #print(maze.y_current)
         show_maze(maze)
-        t.sleep(0.4)
+        t.sleep(0.01)
+        if maze.x_current == maze.x_end and maze.y_current == maze.y_end:
+            break
+    if maze.x_current == maze.x_end and maze.y_current == maze.y_end:
+        print("Find exit in:", steps, "steps.")
+    else:
+        print("Cannot find exit in:", steps, "steps.")
 
 if __name__ == "__main__":
     main()
