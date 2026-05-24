@@ -26,22 +26,25 @@ def show_maze(maze: Maze):
     The green cell represents maze input.
     The red cell represents maze output.
     """
-    YELLOW = "\033[33m"
-    GREEN = "\033[32m"
-    RED = "\033[31m"
     RESET = "\033[0m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
 
     def format_cell(cell: c_int8, cell_x: int, cell_y: int) -> str:
-        if cell >> SQUARE_OCCUPIED_BIT & 1 == 1:
-            result = "☒"
-        else:
-            result = "☐"
+        result = "☐"
         if cell_x == maze.x_start and cell_y == maze.y_start:
             result = GREEN + result + RESET
-        if cell_x == maze.x_end and cell_y == maze.y_end:
+        elif cell_x == maze.x_end and cell_y == maze.y_end:
             result = RED + result + RESET
-        if cell_x == maze.x_current and cell_y == maze.y_current:
+        elif cell_x == maze.x_current and cell_y == maze.y_current:
+            result = "☒"
             result = YELLOW + result + RESET
+        elif  cell >> SQUARE_OCCUPIED_BIT & 1 == 1:
+            result = MAGENTA + result + RESET
         return result
 
     for y, row in enumerate(reversed(maze.maze)):
