@@ -14,12 +14,6 @@ from const import N, E, S, W
 
 rng = random.Random(42)
 
-def get_semi_random_int() -> int:
-    """Return random int from 1 to 10 base on seed 42
-    
-    This is egzample fucntion"""
-    return rng.randint(1,10)
-
 def get_random_direction() -> int:
     """Returns random direction, representation of: {N, E, S, W}
     """
