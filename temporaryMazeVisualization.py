@@ -35,6 +35,7 @@ def show_maze(maze: Maze):
     CYAN = "\033[36m"
 
     def format_cell(cell: c_int8, cell_x: int, cell_y: int) -> str:
+        """Defines how cell is displayed to user via console. Displays it."""
         result = "☐"
         if cell_x == maze.x_start and cell_y == maze.y_start:
             result = GREEN + result + RESET

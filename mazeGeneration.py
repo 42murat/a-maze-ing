@@ -61,6 +61,7 @@ class Maze:
         return True
     
     def update_possition(self, direction: int) -> None:
+        """Change cell status (if it was current cell once it is accupied variable is set to true)."""
         if direction == N:
             self.y_current += 1
         if direction == E:
@@ -72,6 +73,9 @@ class Maze:
         self.maze[self.y_current][self.x_current] = self.maze[self.y_current][self.x_current] | 1 << SQUARE_OCCUPIED_BIT
 
     def generate_path_step(self, p: float) -> None:
+        """Generate step for solution-path.
+        
+        Repeat this process untill step is valis (like not outside maze)."""
         direction = 0
         while True:
             direction = get_direction(self, p)
