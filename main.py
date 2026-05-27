@@ -5,9 +5,23 @@ import time as t
 import os
 
 def clear():
+    """Clear users console form text.
+    
+    It's usually executed before displaying maze."""
     os.system("cls" if os.name == "nt" else "clear")
 
 def main() -> None:
+    """For now generate empty maze. Then create solution-path step until finds exit or reach certain steps.
+
+
+    The solution path is not valid - it can overlaps it self 
+    (pass through some square more than once) and is random.
+    Actually for test I make it have tendency to points away
+    form maze exit at start,then after some steps is completly
+    random,and after some steps it starts to points towards 
+    exit - thats because I want it to be sligthly longer,
+    but has to be discuss. 
+    """
     clear()
     maze = Maze(
         width=20,
