@@ -26,18 +26,18 @@ def main() -> None:
     """
     clear()
     maze = Maze(
-        width=30,
-        height=30,
-        x_start=29,
+        width=35,
+        height=35,
+        x_start=24,
         y_start=1,
         x_end=0,
-        y_end=0
+        y_end=9
     )
     maze.generate_empty()
     show_maze(maze)
     t.sleep(1)
 
-    max_steps = 500
+    max_steps = 1500
     steps = 0
     for i in range(max_steps):
         if i < max_steps / 4:
@@ -49,7 +49,7 @@ def main() -> None:
         steps += 1
         clear()
         show_maze(maze)
-        t.sleep(0.01)
+        t.sleep(0.11)
         if maze.x_current == maze.x_end and maze.y_current == maze.y_end:
             break
     if maze.x_current == maze.x_end and maze.y_current == maze.y_end:

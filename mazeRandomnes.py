@@ -56,6 +56,6 @@ def get_direction(maze: Maze, p: float = 0.1):
         probability_array.append(E)
     for _ in range((int)((array_size / 4) * (1 - p * sign(x_diff)))):
         probability_array.append(W)
-    print("dummy")
+    #print("dummy")
     number = rng.randint(0,array_size - 1)
     return probability_array[number]
