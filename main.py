@@ -3,7 +3,7 @@ from mazeGeneration import Maze
 from temporaryMazeVisualization import show_maze
 import time as t
 import os
-
+#ajofknsdljfkn
 def clear():
     """Clear users console form text.
     
