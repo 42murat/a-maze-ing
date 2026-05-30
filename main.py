@@ -4,6 +4,8 @@ from temporaryMazeVisualization import show_maze
 import time as t
 import os
 
+#Test
+
 def clear():
     """Clear users console form text.
     
@@ -24,9 +26,9 @@ def main() -> None:
     """
     clear()
     maze = Maze(
-        width=20,
-        height=20,
-        x_start=19,
+        width=30,
+        height=30,
+        x_start=29,
         y_start=1,
         x_end=0,
         y_end=0
