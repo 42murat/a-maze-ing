@@ -34,6 +34,7 @@ class Maze:
         the inner maze cells in single row. Inner value is string representing
         cell status (what walls are occupied) in hex (string)."""
         #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
+        #In example-maze.jpg there is what this maze looks like
         #THIS WHAT THIS FUCNTION COULD RETURN:
         return [
             ["B", "D", "5", "3", "B"],
