@@ -5,6 +5,9 @@ import time as t
 import os
 
 #Test
+import subprocess
+import sys
+import os
 
 def clear():
     """Clear users console form text.
@@ -24,20 +27,39 @@ def main() -> None:
     exit - thats because I want it to be sligthly longer,
     but has to be discuss. 
     """
+
+    #VIBE CODING
+    #THATS EVEN MORE EXPERIMENTAL FEATURE
+    maze_width = 50
+    maze_height = 50
+    if os.environ.get("IN_NEW_WINDOW") != "1":
+        env = os.environ.copy()
+        env["IN_NEW_WINDOW"] = "1"
+
+        subprocess.Popen([
+            "gnome-terminal",
+            f"--geometry={maze_width * 2}x{maze_height + 2}",
+            "--",
+            "bash",
+            "-c",
+            f"IN_NEW_WINDOW=1 python3 {sys.argv[0]}; read -n 1 -s -p ''"
+        ])
+
+        sys.exit()
     clear()
     maze = Maze(
-        width=35,
-        height=35,
-        x_start=24,
+        width=maze_width,
+        height=maze_height,
+        x_start=9,
         y_start=1,
-        x_end=0,
-        y_end=9
+        x_end=49,
+        y_end=49
     )
     maze.generate_empty()
     show_maze(maze)
     t.sleep(1)
 
-    max_steps = 1500
+    max_steps = 2500
     steps = 0
     for i in range(max_steps):
         if i < max_steps / 4:
@@ -49,7 +71,7 @@ def main() -> None:
         steps += 1
         clear()
         show_maze(maze)
-        t.sleep(0.11)
+        t.sleep(0.03)
         if maze.x_current == maze.x_end and maze.y_current == maze.y_end:
             break
     if maze.x_current == maze.x_end and maze.y_current == maze.y_end:
