@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+import random
 
 @dataclass
 class MazeParameters:
@@ -21,7 +22,8 @@ class MazeParameters:
                  exit_y: int = 9,
                  output_file_path: str = "output_maze.txt",
                  perfect: bool = True,
-                 visualize: bool = True
+                 visualize: bool = True,
+                 seed: int = 42
                 ):
         self.width: int = width
         self.height: int = height
@@ -32,6 +34,7 @@ class MazeParameters:
         self.output_file_path: str = output_file_path
         self.perfect: bool = perfect
         self.visualize: bool = visualize
+        self.seed: int = seed
 
 class Maze:
     def __init__(self, parameters: MazeParameters):
@@ -44,6 +47,8 @@ class Maze:
             def __init__(self, maze: Maze):
                 self.maze: Maze = maze
                 self.cells_by_id: dict[int, list[Maze.Cell]] = {}
+                self.available_cells_by_id: dict[int, list[Maze.Cell]] = {}
+                self.rng = random.Random(maze.parameters.seed)
 
             def fill_all_cells(self) -> None:
                 """Set all maze cells to fully closed (all walls occupied)."""
@@ -112,20 +117,43 @@ class Maze:
                 for y, row in enumerate(reversed(pattern_42)):
                     for x, pattern in enumerate(row):
                         if pattern == 1:
-                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).sub_maze_id = -1
-                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).N_wall = False
-                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).E_wall = False
-                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).S_wall = False
-                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).W_wall = False
+                            cell = self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y)
+                            self.cells_by_id[cell.sub_maze_id].remove(cell)
+                            if len(self.cells_by_id[cell.sub_maze_id]) == 0:
+                                del self.cells_by_id[cell.sub_maze_id]
+                            cell.sub_maze_id = -1
+                            self.cells_by_id.setdefault(-1, []).append(cell)
+                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).N_wall = False
+                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).E_wall = False
+                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).S_wall = False
+                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).W_wall = False
 
             def generate_perfect_maze(self) -> None:
                 """Generates perfect maze (maze with no loops). All cells (except)
                 cells in 42 pattern are part of maze. There is only one path
                 connecting maze start with maze exit."""
                 ...
+                def remove_random_wall() -> None:
+                    """Tryies to remove random wall from maze. 
+                    If wall is removed the two sub-mazes are merged into one sub-maze. 
+                    If wall can't be removed (because it part of maze side or 42 pattern or 
+                    cells are already in the same sub-maze) the function does nothing.
+                    
+                    The function pick random cell from available_cells_by_id,
+                    then pick random wall from this cell and try to remove it.
+                    If wall is removed the two sub-mazes are merged into one sub-maze
+                    and cells ids are updated in cells_by_id and available_cells_by_id."""
+                    random_cell = self.rng.choice(list(self.available_cells_by_id.values()))
+                    a = 1
+
+
+                self.available_cells_by_id = self.cells_by_id.copy()
+                self.available_cells_by_id.pop(-1, None)
+                # while len(self.available_cells_by_id) > 1:
+                #     remove_random_wall()
 
             def remove_some_walls(self) -> None:
-                """Removes some walls from maze to create loops in maze.
+                """Removes some walls from maze to create loops in maze
                 
                 This is take into account condition:
                     The maze can't have large open areas. Corridors can't be wider
