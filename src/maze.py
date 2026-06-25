@@ -37,15 +37,12 @@ class Maze:
         """Initialize maze object - it's content (cells) is not initialized yet."""
         self.parameters: MazeParameters = parameters
         self.cells: list[list[Maze.Cell]] = []
+        self.generator: Maze.MazeGenerator = Maze.MazeGenerator(self)
     
-
-    def generate(self) -> None:
-        """Cretes maze - do all stuff we talked about, like creating sollution path,
-        filling the rest of maze, etc. Returns Maze class object."""
-        ...
-        class MazeGenerator:
+    class MazeGenerator:
             def __init__(self, maze: Maze):
                 self.maze: Maze = maze
+                self.cells_by_id: dict[int, list[Maze.Cell]] = {}
 
             def fill_all_cells(self) -> None:
                 """Set all maze cells to fully closed (all walls occupied)."""
@@ -53,7 +50,9 @@ class Maze:
                 for y in range(self.maze.parameters.height):
                     row: list[Maze.Cell] = []
                     for x in range(self.maze.parameters.width):
-                        row.append(Maze.Cell(x, y, cell_sub_maze_id))
+                        cell = Maze.Cell(x, y, cell_sub_maze_id)
+                        row.append(cell)
+                        self.cells_by_id.setdefault(cell_sub_maze_id, []).append(cell)
                         cell_sub_maze_id += 1
                     self.maze.cells.append(row)
 
@@ -133,13 +132,17 @@ class Maze:
                     but never a 3x3 open area."""
                 ...
 
-        generator = MazeGenerator(self)
 
-        generator.fill_all_cells()
-        generator.set_42_pattern()
-        generator.generate_perfect_maze()
+    def generate(self) -> None:
+        """Cretes maze - do all stuff we talked about, like creating sollution path,
+        filling the rest of maze, etc. Returns Maze class object."""
+        ...
+
+        self.generator.fill_all_cells()
+        self.generator.set_42_pattern()
+        self.generator.generate_perfect_maze()
         if not self.parameters.perfect:
-            generator.remove_some_walls()
+            self.generator.remove_some_walls()
 
 
     class Cell:
