@@ -15,6 +15,13 @@ def main(argv: list[str]) -> None:
     maze_parameters = check_arguments(argv)
     maze = Maze(maze_parameters)
     maze.generate()
+    print("Maze hex:")
+    maze_hex = maze.get_maze_hex()
+    for row in maze_hex:
+        for cell in row:
+            print(cell, end=" ")
+        print("")
+
     export_to_file(maze)
     if (maze_parameters.visualize):
         visualize(maze)
