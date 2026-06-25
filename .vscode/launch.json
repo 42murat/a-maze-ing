@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Run main.py",
-      "type": "python",
+      "name": "Python: Run a_maze_ing.py",
+      "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/main.py",
+      "program": "${workspaceFolder}/a_maze_ing.py",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}"
     }
