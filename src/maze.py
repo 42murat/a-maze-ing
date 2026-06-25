@@ -123,10 +123,10 @@ class Maze:
                                 del self.cells_by_id[cell.sub_maze_id]
                             cell.sub_maze_id = -1
                             self.cells_by_id.setdefault(-1, []).append(cell)
-                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).N_wall = False
-                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).E_wall = False
-                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).S_wall = False
-                            self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).W_wall = False
+                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).N_wall = False
+                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).E_wall = False
+                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).S_wall = False
+                            # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).W_wall = False
 
             def generate_perfect_maze(self) -> None:
                 """Generates perfect maze (maze with no loops). All cells (except)
@@ -143,14 +143,24 @@ class Maze:
                     then pick random wall from this cell and try to remove it.
                     If wall is removed the two sub-mazes are merged into one sub-maze
                     and cells ids are updated in cells_by_id and available_cells_by_id."""
-                    random_cell = self.rng.choice(list(self.available_cells_by_id.values()))
+                    def avalilable_walls(cell: Maze.Cell) -> list[str]:
+                        """Returns list of walls that can be removed from cell."""
+                        walls: list[str] = []
+                        top_cell = self.maze.get_N_cell(cell)
+                        if top_cell and cell.N_wall and cell.y > 0:
+                            a = 1
+                        return walls
+
+                    random_cell = self.rng.choice(list(self.available_cells_by_id.values()))[0]
+                    available_walls = avalilable_walls(random_cell)
                     a = 1
+
 
 
                 self.available_cells_by_id = self.cells_by_id.copy()
                 self.available_cells_by_id.pop(-1, None)
-                # while len(self.available_cells_by_id) > 1:
-                #     remove_random_wall()
+                while len(self.available_cells_by_id) > 1:
+                    remove_random_wall()
 
             def remove_some_walls(self) -> None:
                 """Removes some walls from maze to create loops in maze
@@ -204,6 +214,12 @@ class Maze:
     def get_cell(self, x: int, y: int) -> Cell:
         """Returns maze cell at coordinates (x, y)."""
         return self.cells[y][x]
+    
+    def get_N_cell(self, cell: Cell) -> Cell | None:
+        """Returns maze cell at coordinates (x, y + 1) or None if cell is on maze border."""
+        if cell.y == self.parameters.height - 1:
+            return None
+        return self.get_cell(cell.x, cell.y + 1)
 
     def get_maze_hex(self) -> list[list[str]]:
         """Returns list list of strings, the outer list repesents maze rows,
