@@ -14,8 +14,8 @@ class MazeParameters:
         ..."""
     #FIXME: For now I'm mocking arguments, because other functions depends on it.
     def __init__(self,
-                 width: int = 18,
-                 height: int = 18,
+                 width: int = 19,
+                 height: int = 19,
                  entry_x: int = 0,
                  entry_y: int = 0,
                  exit_x: int = 1,
@@ -49,6 +49,7 @@ class Maze:
                 self.cells_by_id: dict[int, list[Maze.Cell]] = {}
                 self.available_cells: list[Maze.Cell] = []
                 self.rng = random.Random(maze.parameters.seed)
+                # self.removed_walls = 0
 
             def fill_all_cells(self) -> None:
                 """Set all maze cells to fully closed (all walls occupied)."""
@@ -187,6 +188,7 @@ class Maze:
             def _remove_random_wall(self, walls: list[str], cell: Maze.Cell) -> None:
                         """Removes random wall from cell and updates cells_by_id and available_cells_by_id."""
                         wall = self.rng.choice(walls)
+                        # self.removed_walls += 1
                         if wall == "N":
                             cell.N_wall = False
                             top_cell = self.maze.get_N_cell(cell)
@@ -208,6 +210,37 @@ class Maze:
                             left_cell.E_wall = False
                             self._merge_sub_mazes(cell, left_cell)
 
+            def _pick_semi_random_cell(self) -> Maze.Cell:
+                """For fun to make maze look more like typical maze instead of just
+                picking random cell form avaliable_cells I coded this algirithm,
+                that preferce to pick cell that are in larger sub_mazes and at this
+                sub_mazes ends - so the maze corridiors will be longer and there would
+                be less splits in the maze."""
+                import math as m
+                keys = [x for x in self.cells_by_id if x != -1]
+                weights = [m.pow(len(self.cells_by_id[x]), 10) if len(self.cells_by_id[x]) in range(3)
+                            else 10000000 for x in keys]
+                picked_sub_maze_id = self.rng.choices(
+                    keys,
+                    weights = weights,
+                    k=1
+                )[0]
+                a = 1
+                weights = [
+                        100000000 if len(self._available_walls(cell)) == 3
+                        else 10000 if len(self._available_walls(cell)) == 2
+                        else 1
+                        for cell in self.cells_by_id[picked_sub_maze_id]
+                    ]
+                a = 1
+                result = self.rng.choices(
+                    self.cells_by_id[picked_sub_maze_id],
+                    weights = weights,
+                    k = 1
+                )[0]
+                return result
+
+
             def _try_remove_random_wall(self) -> None:
                     """Tryies to remove random wall from maze. 
                     If wall is removed the two sub-mazes are merged into one sub-maze. 
@@ -218,11 +251,14 @@ class Maze:
                     then pick random wall from this cell and try to remove it.
                     If wall is removed the two sub-mazes are merged into one sub-maze
                     and cells ids are updated in cells_by_id and available_cells_by_id."""
-                    random_cell = self.rng.choice(self.available_cells)
+                    random_cell = self._pick_semi_random_cell()
+                    # random_cell = self.rng.choice(self.available_cells)
                     available_walls = self._available_walls(random_cell)
                     if len(available_walls) == 0:
-                         self.available_cells.remove(random_cell)
-                         return
+                        available_walls = self._available_walls(random_cell)
+                        if random_cell in self.available_cells:
+                            self.available_cells.remove(random_cell)
+                        return
                     self._remove_random_wall(available_walls, random_cell)
                     if len(available_walls) <= 1:
                         self.available_cells.remove(random_cell)
@@ -239,6 +275,7 @@ class Maze:
                 if -1 in self.cells_by_id:
                     while len(self.cells_by_id) > 2:
                         self._try_remove_random_wall()
+                    # a = 1
                 else:
                     while len(self.cells_by_id) > 1:
                         self._try_remove_random_wall()
