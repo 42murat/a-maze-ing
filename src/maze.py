@@ -210,6 +210,23 @@ class Maze:
                             left_cell.E_wall = False
                             self._merge_sub_mazes(cell, left_cell)
 
+            def _nearby_cells_in_same_sub_maze(self, cell: Maze.Cell) -> int:
+                """Returns number of cells in the same sub-maze that are nearby cell."""
+                count: int = 0
+                top_cell = self.maze.get_N_cell(cell)
+                right_cell = self.maze.get_E_cell(cell)
+                bottom_cell = self.maze.get_S_cell(cell)
+                left_cell = self.maze.get_W_cell(cell)
+                if top_cell and top_cell.sub_maze_id == cell.sub_maze_id:
+                    count += 1
+                if right_cell and right_cell.sub_maze_id == cell.sub_maze_id:
+                    count += 1
+                if bottom_cell and bottom_cell.sub_maze_id == cell.sub_maze_id:
+                    count += 1
+                if left_cell and left_cell.sub_maze_id == cell.sub_maze_id:
+                    count += 1
+                return count
+
             def _pick_semi_random_cell(self) -> Maze.Cell:
                 """For fun to make maze look more like typical maze instead of just
                 picking random cell form avaliable_cells I coded this algirithm,
@@ -218,8 +235,13 @@ class Maze:
                 be less splits in the maze."""
                 import math as m
                 keys = [x for x in self.cells_by_id if x != -1]
-                weights = [m.pow(len(self.cells_by_id[x]), 10) if len(self.cells_by_id[x]) in range(3)
-                            else 10000000 for x in keys]
+                weights = [
+                    10 if len(self.cells_by_id[x]) == 1
+                    else 10 if len(self.cells_by_id[x]) == 2
+                    else 10 if len(self.cells_by_id[x]) == 3
+                    else len(self.cells_by_id[x]) * 25
+                    for x in keys
+                        ]
                 picked_sub_maze_id = self.rng.choices(
                     keys,
                     weights = weights,
@@ -227,8 +249,9 @@ class Maze:
                 )[0]
                 a = 1
                 weights = [
-                        100000000 if len(self._available_walls(cell)) == 3
-                        else 10000 if len(self._available_walls(cell)) == 2
+                        1 if len(self._available_walls(cell)) == 3
+                        or len(self._available_walls(cell)) == 4
+                        else 100 if len(self._available_walls(cell)) == 2
                         else 1
                         for cell in self.cells_by_id[picked_sub_maze_id]
                     ]
