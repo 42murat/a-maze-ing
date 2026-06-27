@@ -5,7 +5,7 @@ import random
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.maze import Maze
+    from .maze import Maze
 
 
 class MazeGenerator:

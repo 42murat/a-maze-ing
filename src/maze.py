@@ -43,10 +43,12 @@ class Maze:
     def __init__(self, parameters: MazeParameters):
         """Initialize maze object - it's content (cells) is not initialized yet."""
         from .maze_generator import MazeGenerator
+        from .path_generator import PathGenerator
 
         self.parameters: MazeParameters = parameters
         self.cells: list[list[Maze.Cell]] = []
-        self.generator: MazeGenerator = MazeGenerator(self)
+        self.maze_generator: MazeGenerator = MazeGenerator(self)
+        self.path_generator: PathGenerator = PathGenerator()
     
     
 
@@ -55,11 +57,11 @@ class Maze:
         filling the rest of maze, etc. Returns Maze class object."""
         ...
 
-        self.generator.fill_all_cells()
-        self.generator.set_42_pattern()
-        self.generator.generate_perfect_maze()
+        self.maze_generator.fill_all_cells()
+        self.maze_generator.set_42_pattern()
+        self.maze_generator.generate_perfect_maze()
         if not self.parameters.perfect:
-            self.generator.remove_some_walls()
+            self.maze_generator.remove_some_walls()
 
 
     class Cell:
@@ -165,7 +167,12 @@ class Maze:
         SWNSWESESEEWS... and is string"""
         #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
         #THIS WHAT THIS FUCNTION COULD RETURN:
-        return "NENNE"
+        # return "NENNE"
+        return self.path_generator.generate_solution_path(
+            self,
+            self.get_cell(self.parameters.entry_x, self.parameters.entry_y),
+            self.get_cell(self.parameters.exit_x, self.parameters.exit_y)
+        )
 
 
     def re_generate(self) -> None:

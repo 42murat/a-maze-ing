@@ -68,6 +68,7 @@ def main(argv: list[str]) -> None:
         temp_visualize(maze)
         # temp_visualize_hex(maze)
     a = 1
+    print(maze.get_shortest_path())
 
 if __name__ == "__main__":
     main(sys.argv)
