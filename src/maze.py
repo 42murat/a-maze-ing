@@ -21,12 +21,12 @@ class MazeParameters:
                  height: int = 19,
                  entry_x: int = 0,
                  entry_y: int = 0,
-                 exit_x: int = 1,
-                 exit_y: int = 0,
+                 exit_x: int = 18,
+                 exit_y: int = 18,
                  output_file_path: str = "output_maze.txt",
                  perfect: bool = True,
                  visualize: bool = True,
-                 seed: int = 43
+                 seed: int = 42
                 ):
         self.width: int = width
         self.height: int = height
@@ -60,8 +60,8 @@ class Maze:
         self.maze_generator.fill_all_cells()
         self.maze_generator.set_42_pattern()
         self.maze_generator.generate_perfect_maze()
-        if not self.parameters.perfect:
-            self.maze_generator.remove_some_walls()
+        # if not self.parameters.perfect:
+            # self.maze_generator.remove_some_walls()
 
 
     class Cell:
@@ -91,6 +91,19 @@ class Maze:
             """Returns cell walls status in hex (string)."""
             return hex(self.N_wall<<0 | self.E_wall<<1 | self.S_wall<<2 | self.W_wall<<3)[2:].upper()
         
+        def get_walls(self) -> list[str]:
+            """Returns list of strings representing cell walls status (N, E, S, W)."""
+            result: list[str] = []
+            if self.N_wall:
+                result.append("N")
+            if self.E_wall:
+                result.append("E")
+            if self.S_wall:
+                result.append("S")
+            if self.W_wall:
+                result.append("W")
+            return result
+
     def get_cell(self, x: int, y: int) -> Cell:
         """Returns maze cell at coordinates (x, y)."""
         return self.cells[y][x]

@@ -99,6 +99,27 @@ def main(argv: list[str]) -> None:
     maze_parameters = check_arguments(argv)
     maze = Maze(maze_parameters)
     maze.generate()
+    # maze.maze_generator.remove_wall(
+    #     cell=maze.get_cell(
+    #         x = 1,
+    #         y = 1,
+    #     ),
+    #     wall='S'
+    # )
+    maze.maze_generator.remove_wall(
+        cell=maze.get_cell(
+            x = 9,
+            y = 0,
+        ),
+        wall='E'
+    )
+    maze.maze_generator.restore_wall(
+        cell=maze.get_cell(
+            x = 2,
+            y = 1,
+        ),
+        wall='N'
+    )
     export_to_file(maze)
     if (maze_parameters.visualize):
         # visualize(maze)

@@ -228,7 +228,6 @@ class MazeGenerator:
                 )[0]
                 return result
 
-
             def _try_remove_random_wall(self) -> None:
                     """Tryies to remove random wall from maze. 
                     If wall is removed the two sub-mazes are merged into one sub-maze. 
@@ -263,10 +262,52 @@ class MazeGenerator:
                 if -1 in self.cells_by_id:
                     while len(self.cells_by_id) > 2:
                         self._try_remove_random_wall()
-                    # a = 1
                 else:
                     while len(self.cells_by_id) > 1:
                         self._try_remove_random_wall()
+
+            def remove_wall(self, wall: str, cell : Maze.Cell) -> None:
+                """Removes wall connecting cell and cell in a direction
+                of wall. Does not check wheter such move makes maze
+                not validates its conditions."""
+                if wall == "N":
+                    cell.N_wall = False
+                    top_cell = self.maze.get_N_cell(cell)
+                    top_cell.S_wall = False
+                elif wall == "E":
+                    cell.E_wall = False
+                    right_cell = self.maze.get_E_cell(cell)
+                    right_cell.W_wall = False
+                elif wall == "S":
+                    cell.S_wall = False
+                    bottom_cell = self.maze.get_S_cell(cell)
+                    bottom_cell.N_wall = False
+                elif wall == "W":
+                    cell.W_wall = False
+                    left_cell = self.maze.get_W_cell(cell)
+                    left_cell.E_wall = False
+
+            def restore_wall(self, wall: str, cell: Maze.Cell) -> None:
+                """Restores wall connecting cell and cell in a direction
+                of wall. Does not check wheter such move makes maze
+                not validates its conditions."""
+                if wall == "N":
+                    cell.N_wall = True
+                    top_cell = self.maze.get_N_cell(cell)
+                    top_cell.S_wall = True
+                elif wall == "E":
+                    cell.E_wall = True
+                    right_cell = self.maze.get_E_cell(cell)
+                    right_cell.W_wall = True
+                elif wall == "S":
+                    cell.S_wall = True
+                    bottom_cell = self.maze.get_S_cell(cell)
+                    bottom_cell.N_wall = True
+                elif wall == "W":
+                    cell.W_wall = True
+                    left_cell = self.maze.get_W_cell(cell)
+                    left_cell.E_wall = True
+
 
             def remove_some_walls(self) -> None:
                 """Removes some walls from maze to create loops in maze
@@ -276,3 +317,17 @@ class MazeGenerator:
                     than 2 cells. For example, you can have 2x3 or 3x2 open area,
                     but never a 3x3 open area."""
                 ...
+                removed_walls = 0
+                while removed_walls < 10:
+                    cell = self.rng.choice(self.available_cells)
+                    available_walls = self._available_walls(cell)
+                    if len(self.available_cells) == 0:
+                        break
+                    wall = self.rng.choice(available_walls)
+                    self.remove_wall(wall, cell)
+                    if self.maze_too_open(wall, cell):
+                        self.restore_wall(wall, cell)
+                    else:
+                        removed_walls += 1
+                         
+                    
