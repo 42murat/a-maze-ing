@@ -26,7 +26,7 @@ class MazeParameters:
                  output_file_path: str = "output_maze.txt",
                  perfect: bool = True,
                  visualize: bool = True,
-                 seed: int = 42
+                 seed: int = 43
                 ):
         self.width: int = width
         self.height: int = height
@@ -48,7 +48,7 @@ class Maze:
         self.parameters: MazeParameters = parameters
         self.cells: list[list[Maze.Cell]] = []
         self.maze_generator: MazeGenerator = MazeGenerator(self)
-        self.path_generator: PathGenerator = PathGenerator()
+        self.path_generator: PathGenerator = PathGenerator(self)
     
     
 
