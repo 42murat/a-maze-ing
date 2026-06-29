@@ -75,6 +75,7 @@ class PathGenerator:
         ) -> str:
         """Looks for solution path (or shortest path to exit) that connects entry
         and exit cells."""
+        self.paths.clear()
         path = self.Path(start_cell)
         self.paths.append(path)
         exit_not_found = True
