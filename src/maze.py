@@ -26,7 +26,7 @@ class MazeParameters:
                  output_file_path: str = "output_maze.txt",
                  perfect: bool = False,
                  visualize: bool = True,
-                 seed: int = 42
+                 seed: int = 41
                 ):
         self.width: int = width
         self.height: int = height

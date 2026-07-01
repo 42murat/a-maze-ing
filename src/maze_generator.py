@@ -370,6 +370,15 @@ class MazeGenerator:
                             result = True
                 return result
 
+            def try_remove_wall(self, cell: Maze.Cell, wall: str) -> bool:
+                """Tryies to remove wall. If success return true.
+                Fails if by remoing wall the maze would become too open.
+                """
+                self.remove_wall(cell, wall)
+                if self.maze_too_open_arround(cell, wall):
+                    self.restore_wall(cell, wall)
+                    return False
+                return True
 
             def remove_some_walls(self) -> None:
                 """Removes some walls from maze to create loops in maze, it ensures
@@ -380,20 +389,21 @@ class MazeGenerator:
                     The maze can't have large open areas. Corridors can't be wider
                     than 2 cells. For example, you can have 2x3 or 3x2 open area,
                     but never a 3x3 open area."""
-                ...
+                self.available_cells.clear()
+                ids = list(self.cells_by_id.keys())
+                id = ids[0] if ids[0] != -1 else ids[1]
+                self.available_cells = self.cells_by_id[id]
                 removed_walls = 0
-                while removed_walls < 120:
+                while removed_walls < 120000 and len(self.available_cells) > 0:
                     cell = self.rng.choice(self.available_cells)
                     available_walls = self._available_walls(cell, perfect_maze=False)
                     if len(available_walls) == 0:
+                        self.available_cells.remove(cell)
                         continue
-                    wall = self.rng.choice(available_walls)
-                    self.remove_wall(cell, wall)
-                    if self.maze_too_open_arround(cell, wall):
-                        self.restore_wall(cell, wall)
-                    else:
-                        removed_walls += 1
-                    if removed_walls == 30:
-                        a = 1
+                    for wall in available_walls:
+                        if self.try_remove_wall(cell, wall):
+                            removed_walls += 1
+                            continue
+                    self.available_cells.remove(cell)
                          
                     
