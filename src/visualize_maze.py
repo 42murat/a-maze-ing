@@ -163,7 +163,7 @@ def parse_coord(coord) -> tuple[int, int]:
 #       maze.get_shortest_path()
 # ============================================================
 
-def get_maze_grid(maze) -> list[list[int]]:
+def get_maze_grid(maze: Maze) -> list[list[int]]:
     """
     Get maze grid as list[list[int]].
 
@@ -198,58 +198,6 @@ def get_maze_grid(maze) -> list[list[int]]:
         return grid
 
     raise ValueError("Maze grid was not found.")
-
-
-def get_start_position(maze) -> tuple[int, int]:
-    """
-    Get the maze entry/start position.
-    """
-    if hasattr(maze, "entry"):
-        return parse_coord(maze.entry)
-
-    if hasattr(maze, "get_start_coord"):
-        return parse_coord(maze.get_start_coord())
-
-    raise ValueError("Maze start position was not found.")
-
-
-def get_exit_position(maze) -> tuple[int, int]:
-    """
-    Get the maze exit position.
-    """
-    if hasattr(maze, "exit"):
-        return parse_coord(maze.exit)
-
-    if hasattr(maze, "get_end_coord"):
-        return parse_coord(maze.get_end_coord())
-
-    raise ValueError("Maze exit position was not found.")
-
-
-def get_solution_path(maze) -> str:
-    """
-    Get the solution path as a string.
-
-    Example:
-        "NENNE"
-
-    It means:
-        North
-        East
-        North
-        North
-        East
-    """
-    if hasattr(maze, "solution_path"):
-        if isinstance(maze.solution_path, list):
-            return "".join(maze.solution_path)
-
-        return str(maze.solution_path)
-
-    if hasattr(maze, "get_shortest_path"):
-        return str(maze.get_shortest_path())
-
-    return ""
 
 
 # ============================================================
@@ -594,7 +542,7 @@ def open_maze_border(
             canvas[len(canvas) - 1][canvas_col] = "empty"
 
 
-def build_canvas(maze, show_path: bool) -> list[list[str]]:
+def build_canvas(maze: Maze, show_path: bool) -> list[list[str]]:
     """
     Build the final drawable canvas.
 
@@ -610,9 +558,9 @@ def build_canvas(maze, show_path: bool) -> list[list[str]]:
     height = len(grid)
     width = len(grid[0])
 
-    start = get_start_position(maze)
-    exit_position = get_exit_position(maze)
-    path = get_solution_path(maze)
+    start = maze.get_start_coord()
+    exit_position = maze.get_end_coord()
+    path = maze.get_shortest_path()
 
     use_bottom_left_system = should_use_bottom_left_system(
         start,
@@ -725,77 +673,6 @@ def print_canvas(
 
 
 # ============================================================
-# RE-GENERATE HELPERS
-# ============================================================
-# We do not want to edit maze.py.
-#
-# So, if maze.re_generate() is broken, this visualizer tries to
-# reset common generator attributes and then calls maze.generate().
-# ============================================================
-
-def reset_maze_object(maze) -> None:
-    """
-    Reset common maze attributes before generating again.
-
-    This is useful for MazeGenerator-style objects.
-    """
-    if not hasattr(maze, "width") or not hasattr(maze, "height"):
-        return
-
-    width = maze.width
-    height = maze.height
-
-    if hasattr(maze, "grid"):
-        maze.grid = [[15] * width for _ in range(height)]
-
-    if hasattr(maze, "visited"):
-        maze.visited = [[False] * width for _ in range(height)]
-
-    if hasattr(maze, "solution_path"):
-        maze.solution_path = []
-
-    if hasattr(maze, "mask"):
-        maze.mask = set()
-
-    if hasattr(maze, "pattern_grid"):
-        maze.pattern_grid = []
-
-    if hasattr(maze, "size_warning"):
-        maze.size_warning = ""
-
-    # Change seed so the new maze is different
-    if hasattr(maze, "seed"):
-        maze.seed = random.randint(1, 99999)
-
-
-def regenerate_maze(maze) -> None:
-    """
-    Re-generate maze without editing maze.py.
-
-    First we try:
-        maze.re_generate()
-
-    If it fails, we try:
-        reset maze attributes
-        maze.generate()
-    """
-    if hasattr(maze, "re_generate"):
-        try:
-            maze.re_generate()
-            return
-        except Exception:
-            pass
-
-    reset_maze_object(maze)
-
-    if hasattr(maze, "generate"):
-        maze.generate()
-        return
-
-    raise ValueError("Maze cannot be regenerated.")
-
-
-# ============================================================
 # MAIN VISUALIZER LOOP
 # ============================================================
 
@@ -837,7 +714,7 @@ def visualize(maze: Maze) -> None:
 
         if choice == "1":
             try:
-                regenerate_maze(maze)
+                maze.re_generate()
             except Exception as error:
                 input(f"\nRe-generate error: {error}\nPress Enter...")
 
