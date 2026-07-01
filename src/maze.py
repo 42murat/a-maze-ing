@@ -21,10 +21,10 @@ class MazeParameters:
                  height: int = 19,
                  entry_x: int = 0,
                  entry_y: int = 0,
-                 exit_x: int = 18,
-                 exit_y: int = 18,
+                 exit_x: int = 1,
+                 exit_y: int = 0,
                  output_file_path: str = "output_maze.txt",
-                 perfect: bool = True,
+                 perfect: bool = False,
                  visualize: bool = True,
                  seed: int = 42
                 ):
@@ -60,8 +60,8 @@ class Maze:
         self.maze_generator.fill_all_cells()
         self.maze_generator.set_42_pattern()
         self.maze_generator.generate_perfect_maze()
-        # if not self.parameters.perfect:
-            # self.maze_generator.remove_some_walls()
+        if not self.parameters.perfect:
+            self.maze_generator.remove_some_walls()
 
 
     class Cell:
@@ -105,9 +105,14 @@ class Maze:
             return result
 
     def get_cell(self, x: int, y: int) -> Cell:
-        """Returns maze cell at coordinates (x, y)."""
-        return self.cells[y][x]
-    
+        """Returns maze cell at coordinates (x, y).
+        If cell is out of maze border, returns None."""
+        try:
+            result = self.cells[y][x]
+        except IndexError:
+            return None
+        return result
+
     def get_N_cell(self, cell: Cell) -> Cell | None:
         """Returns maze cell at coordinates (x, y + 1) or None if cell is on maze border."""
         if cell.y == self.parameters.height - 1:

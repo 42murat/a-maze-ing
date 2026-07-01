@@ -94,8 +94,13 @@ class MazeGenerator:
                             # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).S_wall = False
                             # self.maze.get_cell(pattern_x_offset + x, pattern_y_offset + y).W_wall = False
 
-            def _available_walls(self, cell: Maze.Cell) -> list[str]:
-                        """Returns list of walls that can be removed from cell."""
+            def _available_walls(self, cell: Maze.Cell, perfect_maze: bool = True) -> list[str]:
+                        """Returns list of walls that can be removed from cell.
+                        
+                        If perfect_maze is True the function will return only
+                        walls that can be removed without creating loops in maze. 
+                        If perfect_maze is False the function will return all 
+                        walls that can be removed from cell."""
                         walls: list[str] = []
                         top_cell = self.maze.get_N_cell(cell)
                         right_cell = self.maze.get_E_cell(cell)
@@ -105,28 +110,32 @@ class MazeGenerator:
                             top_cell
                             and cell.N_wall
                             and top_cell.sub_maze_id != -1
-                            and cell.sub_maze_id != top_cell.sub_maze_id
+                            and (cell.sub_maze_id != top_cell.sub_maze_id
+                                 or not perfect_maze)
                         ):
                             walls.append("N")
                         if (
                             right_cell
                             and cell.E_wall
                             and right_cell.sub_maze_id != -1
-                            and cell.sub_maze_id != right_cell.sub_maze_id
+                            and (cell.sub_maze_id != right_cell.sub_maze_id
+                                 or not perfect_maze)
                         ):
                             walls.append("E")
                         if (
                             bottom_cell
                             and cell.S_wall
                             and bottom_cell.sub_maze_id != -1
-                            and cell.sub_maze_id != bottom_cell.sub_maze_id
+                            and (cell.sub_maze_id != bottom_cell.sub_maze_id
+                                 or not perfect_maze)
                         ):
                             walls.append("S")
                         if (
                             left_cell
                             and cell.W_wall
                             and left_cell.sub_maze_id != -1
-                            and cell.sub_maze_id != left_cell.sub_maze_id
+                            and (cell.sub_maze_id != left_cell.sub_maze_id
+                                 or not perfect_maze)
                         ):
                             walls.append("W")
                         return walls
@@ -266,7 +275,7 @@ class MazeGenerator:
                     while len(self.cells_by_id) > 1:
                         self._try_remove_random_wall()
 
-            def remove_wall(self, wall: str, cell : Maze.Cell) -> None:
+            def remove_wall(self, cell : Maze.Cell, wall: str) -> None:
                 """Removes wall connecting cell and cell in a direction
                 of wall. Does not check wheter such move makes maze
                 not validates its conditions."""
@@ -287,7 +296,7 @@ class MazeGenerator:
                     left_cell = self.maze.get_W_cell(cell)
                     left_cell.E_wall = False
 
-            def restore_wall(self, wall: str, cell: Maze.Cell) -> None:
+            def restore_wall(self, cell: Maze.Cell, wall: str) -> None:
                 """Restores wall connecting cell and cell in a direction
                 of wall. Does not check wheter such move makes maze
                 not validates its conditions."""
@@ -308,9 +317,64 @@ class MazeGenerator:
                     left_cell = self.maze.get_W_cell(cell)
                     left_cell.E_wall = True
 
+            def open_3x3_box(self, x_center: int, y_center: int) -> bool:
+                """Checks if a 3x3 area around the given center point is completely open.
+                If the center cell is on the edge of the maze it assumes that the cells
+                outside the maze are closed (not open), so it wont omit condition."""
+                center_cell = self.maze.get_cell(x_center, y_center)
+                if not center_cell:
+                    return False
+                top_cell = self.maze.get_N_cell(center_cell)
+                right_cell = self.maze.get_E_cell(center_cell)
+                bottom_cell = self.maze.get_S_cell(center_cell)
+                left_cell = self.maze.get_W_cell(center_cell)
+                if not top_cell or not right_cell or not bottom_cell or not left_cell:
+                    return False
+                if any(
+                    [len(center_cell.get_walls()),
+                    top_cell.E_wall,
+                    top_cell.W_wall,
+                    right_cell.N_wall,
+                    right_cell.S_wall,
+                    bottom_cell.E_wall,
+                    bottom_cell.W_wall,
+                    left_cell.N_wall,
+                    left_cell.S_wall]
+                ):
+                    return False
+                return True
+
+
+            def maze_too_open_arround(self, cell: Maze.Cell, wall: str) -> bool:
+                """Checks whether removing wall from cell would make maze too open.
+                
+                The maze can't have large open areas. Corridors can't be wider
+                than 2 cells. For example, you can have 2x3 or 3x2 open area,
+                but never a 3x3 open area."""
+                if wall == "N" or wall == "S":
+                    x_filter = [cell.x - 1, cell.x, cell.x + 1]
+                    if wall == "N" :
+                        y_filter = [cell.y, cell.y + 1] 
+                    else:
+                        y_filter = [cell.y - 1, cell.y]
+                elif wall == "E" or wall == "W":
+                    if wall == "E":
+                        x_filter = [cell.x, cell.x + 1]
+                    else:
+                        x_filter = [cell.x - 1, cell.x]
+                    y_filter = [cell.y - 1, cell.y, cell.y + 1]
+                result = False
+                for y in y_filter:
+                    for x in x_filter:
+                        if self.open_3x3_box(x, y):
+                            result = True
+                return result
+
 
             def remove_some_walls(self) -> None:
-                """Removes some walls from maze to create loops in maze
+                """Removes some walls from maze to create loops in maze, it ensures
+                that there would be at least more than one solution path in maze.
+                #FIXME: For now it doesnt
                 
                 This is take into account condition:
                     The maze can't have large open areas. Corridors can't be wider
@@ -318,16 +382,18 @@ class MazeGenerator:
                     but never a 3x3 open area."""
                 ...
                 removed_walls = 0
-                while removed_walls < 10:
+                while removed_walls < 120:
                     cell = self.rng.choice(self.available_cells)
-                    available_walls = self._available_walls(cell)
-                    if len(self.available_cells) == 0:
-                        break
+                    available_walls = self._available_walls(cell, perfect_maze=False)
+                    if len(available_walls) == 0:
+                        continue
                     wall = self.rng.choice(available_walls)
-                    self.remove_wall(wall, cell)
-                    if self.maze_too_open(wall, cell):
-                        self.restore_wall(wall, cell)
+                    self.remove_wall(cell, wall)
+                    if self.maze_too_open_arround(cell, wall):
+                        self.restore_wall(cell, wall)
                     else:
                         removed_walls += 1
+                    if removed_walls == 30:
+                        a = 1
                          
                     
