@@ -28,8 +28,11 @@ class PathGenerator:
         else:
             return False
 
-    def get_reachable_cells(self, path: PathGenerator.Path) -> list[Maze.Cell]:
-        """Returns list of cells that are reachable from the last cell in path."""
+    def get_reachable_cells(self, path: PathGenerator.Path, paths: list[PathGenerator.Path]) -> list[Maze.Cell]:
+        """Returns list of cells that are reachable from the last cell in path.
+        
+        Reachable means there is no wall between cells and the cell is not
+        already in the path or other paths."""
         result = []
         last_cell = path.cells[-1]
         top_cell = self.maze.get_N_cell(last_cell)
@@ -38,15 +41,27 @@ class PathGenerator:
         left_cell = self.maze.get_W_cell(last_cell)
         if (
             top_cell
-            and top_cell not in path.cells
+            and not any (top_cell in path.cells for path in paths)
             and self.are_cells_connected(last_cell, top_cell)
         ):
             result.append(top_cell)
-        if right_cell and right_cell not in path.cells and self.are_cells_connected(last_cell, right_cell):
+        if (
+            right_cell 
+            and not any (right_cell in path.cells for path in paths)
+            and self.are_cells_connected(last_cell, right_cell)
+        ):
             result.append(right_cell)
-        if bottom_cell and bottom_cell not in path.cells and self.are_cells_connected(last_cell, bottom_cell):
+        if (
+            bottom_cell
+            and not any(bottom_cell in path.cells for path in paths)
+            and self.are_cells_connected(last_cell, bottom_cell)
+        ):
             result.append(bottom_cell)
-        if left_cell and left_cell not in path.cells and self.are_cells_connected(last_cell, left_cell):
+        if (
+            left_cell 
+            and not any(left_cell in path.cells for path in paths)
+            and self.are_cells_connected(last_cell, left_cell)
+        ):
             result.append(left_cell)
         return result
     
@@ -81,8 +96,7 @@ class PathGenerator:
         exit_not_found = True
         while exit_not_found:
             for path in self.paths[:]:
-                # extra_paths = 0
-                reachable_cells = self.get_reachable_cells(path)
+                reachable_cells = self.get_reachable_cells(path, self.paths)
                 if len(reachable_cells) == 0:
                     self.paths.remove(path)
                 elif len(reachable_cells) == 1:
@@ -100,15 +114,5 @@ class PathGenerator:
                         if cell == exit_cell:
                             exit_not_found = False
                             return self.decode_path(self.paths[-1].cells)
-                # for cell in reachable_cells:
-                #     if extra_paths == 0:
-                #         if cell not in path:
-                #             path.cells.append(cell)
-                #     else:
-                #         new_path = path.copy()
-                #         new_path.cells.append(cell)
-                #         self.paths.append(new_path)
-                #     if cell == exit_cell:
-                #         exit_not_found = False
         return self.decode_path(self.paths[-1].cells)
         
