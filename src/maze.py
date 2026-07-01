@@ -17,12 +17,12 @@ class MazeParameters:
         ..."""
     #FIXME: For now I'm mocking arguments, because other functions depends on it.
     def __init__(self,
-                 width: int = 19,
-                 height: int = 19,
+                 width: int = 20,
+                 height: int = 20,
                  entry_x: int = 0,
                  entry_y: int = 0,
-                 exit_x: int = 18,
-                 exit_y: int = 18,
+                 exit_x: int = 19,
+                 exit_y: int = 19,
                  output_file_path: str = "output_maze.txt",
                  perfect: bool = True,
                  visualize: bool = True,
@@ -139,16 +139,6 @@ class Maze:
         
         When displaying the  maze rows viev  is form top to bottom, and when
             dispalying maze cells in single row view is from left to right."""
-        #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
-        #In example-maze.jpg there is what this maze looks like
-        #THIS WHAT THIS FUCNTION COULD RETURN:
-        # return [
-        #     ["B", "D", "5", "3", "B"],
-        #     ["C", "1", "7", "A", "A"],
-        #     ["D", "2", "9", "6", "A"],
-        #     ["9", "2", "A", "9", "2"],
-        #     ["E", "C", "4", "6", "E"]
-        # ]
         result: list[list[str]] = []
         for row in reversed(self.cells):
             result_row: list[str] = []
@@ -161,26 +151,25 @@ class Maze:
         """Returns file path to which export maze."""
         ...
 
-    def get_start_coord(self) -> str:
+    def get_start_coord(self) -> tuple[int, int]:
         """Returns coordinates of maze start."""
-        #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
-        #THIS WHAT THIS FUCNTION COULD RETURN:
-        return "0,0"
+        return (
+            self.get_cell(self.parameters.entry_x, self.parameters.entry_y).x,
+            self.get_cell(self.parameters.entry_x, self.parameters.entry_y).y
+        )
 
 
     def get_end_coord(self) -> str:
         """Returns coordinates of maze exit."""
-        #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
-        #THIS WHAT THIS FUCNTION COULD RETURN:
-        return "2,3"
+        return (
+            self.get_cell(self.parameters.exit_x, self.parameters.exit_y).x,
+            self.get_cell(self.parameters.exit_x, self.parameters.exit_y).y
+        )
 
     def get_shortest_path(self) -> str:
         """Returns shortes path connecting maze start with
         maze end. The return data is format like:
         SWNSWESESEEWS... and is string"""
-        #FOR NOW IM MOCKING THIS FUNCTION BECAUSE OTHER FUNCTIONS DEPENDS ON IT.
-        #THIS WHAT THIS FUCNTION COULD RETURN:
-        # return "NENNE"
         return self.path_generator.generate_solution_path(
             self,
             self.get_cell(self.parameters.entry_x, self.parameters.entry_y),
@@ -193,6 +182,6 @@ class Maze:
         def clear_maze(self) -> None:
             """clears maze cells"""
             ...
-        self.clear_maze()
-        self.generate()
+        # self.clear_maze()
+        # self.generate()
 
